@@ -1,0 +1,38 @@
+# voting-app Functionality-{
+    user can vote to particular candidate
+}
+----------------------------------------------------------
+
+# voting-app Functionality
+
+1.User can Sign-In/Sign-Up
+2.user Can See list Of Candidates
+3.User Can Vote only one time means after voting user can-not vote again 
+4.One Admin For adding Candidates with Details cant vote at all
+5.their is One Rout Which Shows Candidats Vote Count
+6.user data with unique id proof i.e-> Adhar_Id
+7.user can change password using id-proof
+
+-----------------------------------------------------------
+
+# Routes
+
+User/Authentication:
+/sig-up:Post-Create a new Account.
+/sign-in:post-log in to existing account
+
+Voting:
+/candidate:get-get the list of candidates.
+/vote/:candidates:post-vote for a specific candidate.
+
+User Count:
+/voting/count:get-get the list of candidate with vote count.
+
+User Profile:
+/profile:get-get the users profile information.
+/profile/password:puth-change the users password.
+
+Admin Candidate Management:
+/candidate:post-create a new candidate.
+/candidate/:candidateId:put-update an existing candidate.
+/candidate/:candidateId:delete-delete a candidate from the list
