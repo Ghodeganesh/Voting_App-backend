@@ -20,11 +20,28 @@ const createPerson = async (req, res) => {
 }
 
 const listPersons = async (req, res) => {
-  const list = await person.find()
-  res.send(list)
+  try {
+    const user = await person.find()
+    if (!user) {
+      return res.status(404).json({ message: "Person Not Exist" })
+    }
+    res.status(200).send(user)
+  } catch (error) {
+    return res.status(404).send("Error:", error)
+  }
 }
+const loginUsers = async (req, res) => {
 
+  const { name, password } = req.body;
+  const user = await person.findOne({ name: name })
+  if (!user) {
+    return res.status(404).json({ message: "Person Not Found" })
+
+  }
+  // const password = user.password === pa
+}
 module.exports = {
   createPerson,
-  listPersons
+  listPersons,
+  loginUsers
 }
