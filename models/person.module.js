@@ -32,13 +32,13 @@ const personSchema = mongoose.Schema({
         enum: ["voter", "admin"],
         default: "voter"
     },
-    isvoted:{
-        type:Boolean,
-        default:false
+    isvoted: {
+        type: Boolean,
+        default: false
     }
 
 })
 
-
-export const person = mongoose.model("person", personSchema)
+const person = mongoose.model("person", personSchema)
+module.exports = person
 
