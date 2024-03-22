@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 
-const candidateSchema = mongoose.Schema({
+const candidateSchema = new mongoose.Schema({
     name: {
         type: String,
         require: true,
@@ -36,6 +36,6 @@ const candidateSchema = mongoose.Schema({
 
 }, { timestamps: true })
 
+const candidate = mongoose.model("candidate", candidateSchema)
 
-export const candidate = mongoose.model("candidate", candidateSchema)
-
+module.exports = candidate

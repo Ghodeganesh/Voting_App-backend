@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 
-const personSchema = mongoose.Schema({
+const personSchema = new mongoose.Schema({
     name: {
         type: String,
         require: true,
@@ -38,15 +38,39 @@ const personSchema = mongoose.Schema({
     }
 
 })
-personSchema.pre("save", async (req, res) => {
-    const person = this
-    const salt = await bcrypt.getSalt(10)
-    const hashPassword = bcrypt.hashSync(person.password, salt)
 
-    this.password = hashPassword
 
-    console.log(password)
+personSchema.pre("save", async function (next) {
+
+    const person = this;
+    if (!person.isModified('password')) return next()
+
+    try {
+        const salt = await bcrypt.genSalt(10)
+        const hashPassword = await bcrypt.hash(person.password, salt)
+
+        person.password = hashPassword
+        next
+
+    } catch (err) {
+        return next(err)
+    }
 })
+
+personSchema.methods.compass = async function (candidatPass) {
+    try {
+        const match = await bcrypt.compare(candidatPass, this.password)
+        return match
+
+    } catch (err) {
+        throw err
+    }
+
+
+}
+
+
+
 
 const person = mongoose.model("person", personSchema)
 module.exports = person

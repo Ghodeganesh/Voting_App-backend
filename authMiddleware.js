@@ -5,8 +5,9 @@ const authMiddleware = async (req, res, next) => {
     if (!authorization) {
         return res.status(400).send("Token Not Found")
     }
+    
     const token = req.headers.authorization.split(' ')[1];
-
+    
     if (!token) {
         return res.status(401).json({ error: "unauthorized" })
     }

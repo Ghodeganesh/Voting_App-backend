@@ -6,12 +6,14 @@ const createPerson = async (req, res) => {
 
   try {
     const data = await person.create(personInfo)
+    const { password, ...info } = data._doc;
     const payload = {
       name: data.name,
-      email: data.email
+      email: data.email,
+      id: data.id
     }
     const token = genToken(payload)
-    res.status(201).send({ response: data, token: token })
+    res.status(201).send({ response: info, token: token })
 
   } catch (error) {
     console.log("Error While Creating Person :", error)
@@ -32,16 +34,72 @@ const listPersons = async (req, res) => {
 }
 const loginUsers = async (req, res) => {
 
-  const { name, password } = req.body;
-  const user = await person.findOne({ name: name })
-  if (!user) {
-    return res.status(404).json({ message: "Person Not Found" })
+  const data = req.body
+  const adharcardNum = data.adharCardNumber
+  const password = data.password
+  try {
 
+    const user = await person.findOne({ adharCardNumber: adharcardNum })
+    if (!user) {
+      return res.status(404).json({ message: "Person Not Found" })
+    }
+    if (!user || !(await user.compass(password))) {
+      return res.status(500).send("Invalid Password")
+    }
+
+    const payload = {
+      id: user.id
+    }
+    const token = genToken(payload)
+    res.status(201).json({ message: "Token Generated", token: token })
+  } catch (err) {
+    console.error("Error:", err)
+    res.status(500).send("internal Server Error")
   }
-  // const password = user.password === pa
+}
+
+
+const profileHandler = async (req, res) => {
+  try {
+    const userdata = req.person
+    const userId = userdata.id;
+    const user = await person.findById(userId)
+    res.status(200).send(user)
+  } catch (error) {
+    console.error("Internal Error : ", error)
+    res.status(400).send("Error")
+  }
+}
+
+const changePassword = async (req, res) => {
+  try {
+    const personId = req.person;
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await person.findById(personId)
+    if (!(await user.compass(oldPassword))) {
+      return res.status(500).send("Invalid Password")
+    }
+
+    user.password = newPassword
+
+    res.status(200).json({
+      success: true,
+      message: "Password Updated Succesfully",
+      updatedPassword
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error While Changing Password"
+    })
+  }
 }
 module.exports = {
   createPerson,
   listPersons,
-  loginUsers
+  loginUsers,
+  profileHandler,
+  changePassword
 }
