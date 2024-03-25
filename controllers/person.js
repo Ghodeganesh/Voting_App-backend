@@ -6,14 +6,14 @@ const createPerson = async (req, res) => {
 
   try {
     const data = await person.create(personInfo)
-    const { password, ...info } = data._doc;
+
     const payload = {
       name: data.name,
       email: data.email,
       id: data.id
     }
     const token = genToken(payload)
-    res.status(201).send({ response: info, token: token })
+    res.status(201).send({ response: data, token: token })
 
   } catch (error) {
     console.log("Error While Creating Person :", error)
@@ -74,25 +74,32 @@ const profileHandler = async (req, res) => {
 const changePassword = async (req, res) => {
   try {
     const personId = req.person;
-    const { oldPassword, newPassword } = req.body;
 
-    const user = await person.findById(personId)
+    const { oldPassword, newPassword } = req.body;
+    console.log("oldPass: ", oldPassword)
+    console.log("newPass: ", newPassword)
+    console.log("personId: ", personId)
+
+    const user = await person.findById(personId.id)
+    console.log("user is:", user)
     if (!(await user.compass(oldPassword))) {
-      return res.status(500).send("Invalid Password")
+      return res.status(500).send("Invalid oldPassword")
     }
 
     user.password = newPassword
+    console.log(user.password)
 
     res.status(200).json({
       success: true,
-      message: "Password Updated Succesfully",
-      updatedPassword
+      message: "Password Updated Succesfully"
+
     })
 
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Error While Changing Password"
+      message: "Error While Changing Password",
+      err
     })
   }
 }
